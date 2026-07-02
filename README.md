@@ -1,17 +1,17 @@
-# 校园自习室共享空间预约管理系统
+# 校园共享空间预约管理系统
 
-基于 Spring Boot + Vue.js 构建的校园自习室共享空间预约管理系统，为师生提供便捷的座位预约服务。
+基于 Spring Boot + Vue.js 构建的校园共享空间预约管理系统，为师生提供便捷的座位预约服务。
 
 ## 功能特性
 
-- **学生端**: 座位预约、取消预约、签到签退、违规记录查看、个人中心
+- **学生端**: 座位预约、取消预约、签到签退、违规记录查看、个人中心、AI智能助手
 - **教师端**: 管辖自习室管理、预约记录查询、可用座位统计、AI智能助手
 - **管理员端**: 空间管理、用户管理、违规审核、教师认证、操作日志
 
 ## 技术栈
 
-- **后端**: Java Spring Boot 2.7.x + MyBatis-Plus + MySQL + Redis + JWT
-- **前端**: Vue.js 3 + Element Plus + Axios
+- **后端**: Java Spring Boot 2.7.x + MyBatis-Plus + MySQL + JWT 
+- **前端**: Vue.js 2 + Axios
 - **AI助手**: DeepSeek API
 
 ## 项目结构
