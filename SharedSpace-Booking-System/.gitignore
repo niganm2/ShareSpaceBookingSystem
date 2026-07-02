@@ -44,6 +44,9 @@ shared-space-frontend/.DS_Store
 ### Logs ###
 *.log
 
+### Local Config ###
+application-local.yml
+
 ### OS ###
 .DS_Store
 Thumbs.db
