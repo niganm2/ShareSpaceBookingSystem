@@ -45,7 +45,7 @@ shared-space-frontend/.DS_Store
 *.log
 
 ### Local Config ###
-application-local.yml
+application-dev.yml
 
 ### OS ###
 .DS_Store
