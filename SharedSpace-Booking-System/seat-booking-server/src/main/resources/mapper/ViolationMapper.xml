@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seatbooking.mapper.ViolationMapper">
+
+    <resultMap id="ViolationDetailDTOResultMap" type="com.seatbooking.dto.ViolationDetailDTO">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="userRealName" column="user_real_name"/>
+        <result property="userStudentId" column="user_student_id"/>
+        <result property="bookingId" column="booking_id"/>
+        <result property="seatNumber" column="seat_number"/>
+        <result property="spaceName" column="space_name"/>
+        <result property="type" column="type"/>
+        <result property="description" column="description"/>
+        <result property="points" column="points"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="selectAllViolationDetails" resultMap="ViolationDetailDTOResultMap">
+        SELECT v.id, v.user_id, v.booking_id, v.type, v.description, v.points, v.create_time,
+               u.username as user_name, u.real_name as user_real_name, u.student_id as user_student_id,
+               s.seat_number, sp.name as space_name
+        FROM violation v
+        LEFT JOIN sys_user u ON v.user_id = u.id
+        LEFT JOIN booking b ON v.booking_id = b.id
+        LEFT JOIN seat s ON b.seat_id = s.id
+        LEFT JOIN space sp ON b.space_id = sp.id
+        WHERE v.deleted = 0
+        ORDER BY v.create_time DESC
+    </select>
+</mapper>

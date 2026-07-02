@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seatbooking.mapper.BookingMapper">
+
+    <resultMap id="BookingDTOResultMap" type="com.seatbooking.dto.BookingDTO">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="seatId" column="seat_id"/>
+        <result property="spaceId" column="space_id"/>
+        <result property="seatNumber" column="seat_number"/>
+        <result property="spaceName" column="space_name"/>
+        <result property="userName" column="user_name"/>
+        <result property="userRealName" column="user_real_name"/>
+        <result property="userStudentId" column="user_student_id"/>
+        <result property="bookingDate" column="booking_date"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="status" column="status"/>
+        <result property="cancelReason" column="cancel_reason"/>
+    </resultMap>
+
+    <select id="selectBookingPage" resultMap="BookingDTOResultMap">
+        SELECT b.id, b.user_id, b.seat_id, b.space_id, b.booking_date, b.start_time, b.end_time, b.status, b.cancel_reason,
+               s.seat_number, sp.name as space_name, u.username as user_name, u.real_name as user_real_name, u.student_id as user_student_id
+        FROM booking b
+        LEFT JOIN seat s ON b.seat_id = s.id
+        LEFT JOIN space sp ON b.space_id = sp.id
+        LEFT JOIN sys_user u ON b.user_id = u.id
+        WHERE b.user_id = #{userId}
+        <if test="status != null and status != ''">
+            AND b.status = #{status}
+        </if>
+        AND b.deleted = 0
+        ORDER BY b.booking_date DESC, b.start_time DESC
+    </select>
+
+    <select id="selectBookingById" resultMap="BookingDTOResultMap">
+        SELECT b.id, b.user_id, b.seat_id, b.space_id, b.booking_date, b.start_time, b.end_time, b.status, b.cancel_reason,
+               s.seat_number, sp.name as space_name, u.username as user_name, u.real_name as user_real_name, u.student_id as user_student_id
+        FROM booking b
+        LEFT JOIN seat s ON b.seat_id = s.id
+        LEFT JOIN space sp ON b.space_id = sp.id
+        LEFT JOIN sys_user u ON b.user_id = u.id
+        WHERE b.id = #{id} AND b.deleted = 0
+    </select>
+
+    <select id="selectBookingsByDateAndSeat" resultMap="BookingDTOResultMap">
+        SELECT b.id, b.user_id, b.seat_id, b.space_id, b.booking_date, b.start_time, b.end_time, b.status, b.cancel_reason,
+               s.seat_number, sp.name as space_name, u.username as user_name, u.real_name as user_real_name, u.student_id as user_student_id
+        FROM booking b
+        LEFT JOIN seat s ON b.seat_id = s.id
+        LEFT JOIN space sp ON b.space_id = sp.id
+        LEFT JOIN sys_user u ON b.user_id = u.id
+        WHERE b.booking_date = #{date} AND b.seat_id = #{seatId} AND b.deleted = 0
+        ORDER BY b.start_time ASC
+    </select>
+
+    <select id="selectBookingsBySpaceAndDate" resultMap="BookingDTOResultMap">
+        SELECT b.id, b.user_id, b.seat_id, b.space_id, b.booking_date, b.start_time, b.end_time, b.status, b.cancel_reason,
+               s.seat_number, sp.name as space_name, u.username as user_name, u.real_name as user_real_name, u.student_id as user_student_id
+        FROM booking b
+        LEFT JOIN seat s ON b.seat_id = s.id
+        LEFT JOIN space sp ON b.space_id = sp.id
+        LEFT JOIN sys_user u ON b.user_id = u.id
+        WHERE b.space_id = #{spaceId} AND b.booking_date = #{date} AND b.deleted = 0
+        ORDER BY s.seat_number ASC, b.start_time ASC
+    </select>
+
+    <select id="selectBookingsByUserAndDate" resultMap="BookingDTOResultMap">
+        SELECT b.id, b.user_id, b.seat_id, b.space_id, b.booking_date, b.start_time, b.end_time, b.status, b.cancel_reason,
+               s.seat_number, sp.name as space_name, u.username as user_name, u.real_name as user_real_name, u.student_id as user_student_id
+        FROM booking b
+        LEFT JOIN seat s ON b.seat_id = s.id
+        LEFT JOIN space sp ON b.space_id = sp.id
+        LEFT JOIN sys_user u ON b.user_id = u.id
+        WHERE b.user_id = #{userId} AND b.booking_date = #{date} AND b.deleted = 0
+        ORDER BY b.start_time ASC
+    </select>
+
+    <select id="selectAllBookings" resultMap="BookingDTOResultMap">
+        SELECT b.id, b.user_id, b.seat_id, b.space_id, b.booking_date, b.start_time, b.end_time, b.status, b.cancel_reason,
+               s.seat_number, sp.name as space_name, u.username as user_name, u.real_name as user_real_name, u.student_id as user_student_id
+        FROM booking b
+        LEFT JOIN seat s ON b.seat_id = s.id
+        LEFT JOIN space sp ON b.space_id = sp.id
+        LEFT JOIN sys_user u ON b.user_id = u.id
+        WHERE b.deleted = 0
+        <if test="spaceName != null and spaceName != ''">
+            AND sp.name LIKE CONCAT('%', #{spaceName}, '%')
+        </if>
+        <if test="seatNumber != null and seatNumber != ''">
+            AND s.seat_number LIKE CONCAT('%', #{seatNumber}, '%')
+        </if>
+        <if test="bookingDate != null">
+            AND b.booking_date = #{bookingDate}
+        </if>
+        <if test="status != null and status != ''">
+            AND b.status = #{status}
+        </if>
+        ORDER BY b.booking_date DESC, b.start_time DESC
+    </select>
+
+    <select id="selectRecent7DaysCountByUserId" resultType="java.util.Map">
+        SELECT DATE(booking_date) as date, COUNT(*) as count
+        FROM booking
+        WHERE user_id = #{userId} AND deleted = 0
+        AND booking_date >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+        GROUP BY DATE(booking_date)
+        ORDER BY date ASC
+    </select>
+
+    <select id="selectAllRecent7DaysCount" resultType="java.util.Map">
+        SELECT DATE(booking_date) as date, COUNT(*) as count
+        FROM booking
+        WHERE deleted = 0
+        AND booking_date >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+        GROUP BY DATE(booking_date)
+        ORDER BY date ASC
+    </select>
+
+    <select id="selectSeatNumbersBySpaceName" resultType="java.lang.String">
+        SELECT s.seat_number
+        FROM seat s
+        LEFT JOIN space sp ON s.space_id = sp.id
+        WHERE sp.name = #{spaceName} AND s.deleted = 0 AND sp.deleted = 0
+        ORDER BY s.seat_number ASC
+    </select>
+
+    <select id="selectRecent7DaysBySpaceId" resultType="java.util.Map">
+        SELECT DATE(booking_date) as date, COUNT(*) as count
+        FROM booking
+        WHERE space_id = #{spaceId} AND deleted = 0
+        AND booking_date >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+        GROUP BY DATE(booking_date)
+        ORDER BY date ASC
+    </select>
+</mapper>
